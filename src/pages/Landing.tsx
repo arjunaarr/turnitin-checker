@@ -256,9 +256,9 @@ export const Landing: React.FC = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <p className="text-white/50 text-sm">&copy; 2026 Turnitin Check. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="#" className="text-white/50 hover:text-white/80 transition text-sm">Privacy</a>
-            <a href="#" className="text-white/50 hover:text-white/80 transition text-sm">Terms</a>
-            <a href="#" className="text-white/50 hover:text-white/80 transition text-sm">Contact</a>
+            <button className="text-white/50 hover:text-white/80 transition text-sm">Privacy</button>
+            <button className="text-white/50 hover:text-white/80 transition text-sm">Terms</button>
+            <button className="text-white/50 hover:text-white/80 transition text-sm">Contact</button>
           </div>
         </div>
       </footer>
