@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { db } from '../config/firebase';
+import { db, storage } from '../config/firebase';
 import { collection, query, onSnapshot, updateDoc, doc, Timestamp } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 interface Submission {
   id: string;
@@ -79,9 +80,16 @@ export const AdminPanel: React.FC = () => {
     try {
       setUploading(true);
 
+      // Upload result file to Storage
+      const fileRef = ref(storage, `results/${selectedId}-${resultFile.name}`);
+      await uploadBytes(fileRef, resultFile);
+      const fileUrl = await getDownloadURL(fileRef);
+
+      // Update submission with result URL
       await updateDoc(doc(db, 'submissions', selectedId), {
         status: 'completed',
         resultFilename: resultFile.name,
+        resultFileUrl: fileUrl,
         completedAt: Timestamp.now(),
       });
 

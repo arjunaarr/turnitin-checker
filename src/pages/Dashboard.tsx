@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { db } from '../config/firebase';
+import { db, storage } from '../config/firebase';
 import { collection, addDoc, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { PaymentForm } from '../components/PaymentForm';
 
 interface Submission {
@@ -12,7 +13,9 @@ interface Submission {
   uploadedAt: Date;
   expiresAt: Date;
   resultFilename?: string;
+  resultFileUrl?: string;
   completedAt?: Date;
+  originalFileUrl?: string;
 }
 
 export const Dashboard: React.FC = () => {
@@ -47,7 +50,9 @@ export const Dashboard: React.FC = () => {
           uploadedAt: data.uploadedAt?.toDate() || new Date(),
           expiresAt: data.expiresAt?.toDate() || new Date(),
           resultFilename: data.resultFilename,
+          resultFileUrl: data.resultFileUrl,
           completedAt: data.completedAt?.toDate(),
+          originalFileUrl: data.originalFileUrl,
         });
       });
       // Sort by uploadedAt descending
@@ -103,6 +108,12 @@ export const Dashboard: React.FC = () => {
       const now = new Date();
       const expiresAt = new Date(now.getTime() + 2 * 60 * 60 * 1000);
 
+      // Upload file to Firebase Storage
+      const fileRef = ref(storage, `submissions/${currentUser?.uid}/${Date.now()}-${file?.name}`);
+      await uploadBytes(fileRef, file!);
+      const fileUrl = await getDownloadURL(fileRef);
+
+      // Create submission record with file URL
       await addDoc(collection(db, 'submissions'), {
         userId: currentUser?.uid,
         filename: file?.name,
@@ -111,6 +122,7 @@ export const Dashboard: React.FC = () => {
         uploadedAt: Timestamp.now(),
         expiresAt: Timestamp.fromDate(expiresAt),
         originalFileSize: file?.size,
+        originalFileUrl: fileUrl,
         createdAt: Timestamp.now(),
         paymentStatus: 'paid',
       });
@@ -148,11 +160,12 @@ export const Dashboard: React.FC = () => {
   const isExpired = (expiresAt: Date) => new Date() > expiresAt;
 
   const handleDownload = (sub: Submission) => {
-    // Simulate download - in real app, download from storage
-    const link = document.createElement('a');
-    link.href = `data:text/plain,Result for ${sub.filename}`;
-    link.download = sub.resultFilename || `result-${sub.id}.pdf`;
-    link.click();
+    if (!sub.resultFileUrl) {
+      setError('File not available');
+      return;
+    }
+    // Open file di new window untuk download
+    window.open(sub.resultFileUrl, '_blank');
   };
 
   return (
