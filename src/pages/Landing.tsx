@@ -3,12 +3,10 @@ import { Link } from 'react-router-dom';
 
 export const Landing: React.FC = () => {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [glowPos, setGlowPos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
       setGlowPos({ x: e.clientX, y: e.clientY });
     };
 
@@ -53,9 +51,9 @@ export const Landing: React.FC = () => {
             </div>
 
             <nav className="hidden lg:flex items-center gap-8">
-              <a href="#features" className="text-white/60 hover:text-white transition text-sm">Features</a>
-              <a href="#pricing" className="text-white/60 hover:text-white transition text-sm">How It Works</a>
-              <a href="#contact" className="text-white/60 hover:text-white transition text-sm">About</a>
+            <a href="/#features" className="text-white/60 hover:text-white transition text-sm">Features</a>
+            <a href="/#pricing" className="text-white/60 hover:text-white transition text-sm">How It Works</a>
+            <a href="/#contact" className="text-white/60 hover:text-white transition text-sm">About</a>
             </nav>
 
             <div className="flex items-center gap-3">
